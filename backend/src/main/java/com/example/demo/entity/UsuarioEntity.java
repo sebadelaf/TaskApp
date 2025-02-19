@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class UsuarioEntity {
     private String apellido;
     private String correo;
     private String password;
+    @JsonIgnore
     @ElementCollection
     @CollectionTable(name = "usuarios_tareas" // Nombre de la tabla de la colección
     ,joinColumns = @JoinColumn(name = "iduser"))// Clave foránea para la relación
