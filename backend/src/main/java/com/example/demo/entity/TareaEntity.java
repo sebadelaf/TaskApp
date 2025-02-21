@@ -13,6 +13,7 @@ public class TareaEntity {
     public TareaEntity() {}
     public TareaEntity(String Descripcion) {
         this.Descripcion = Descripcion;
+        this.idtarea=idtarea;
         this.estado = 0;
     }
 

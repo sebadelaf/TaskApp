@@ -1,5 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.DTO.CambiarState;
+import com.example.demo.DTO.CreateTarea;
+import com.example.demo.DTO.EliminarTarea;
+import com.example.demo.entity.TareaEntity;
 import com.example.demo.entity.UsuarioEntity;
 import com.example.demo.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +29,29 @@ public class UsuarioController {
     }
 
     @GetMapping("/tareas/{iduser}")
-    public List<Long> tareas(@PathVariable long iduser){
+    public List<TareaEntity> tareas(@PathVariable long iduser){
         return usuarioService.obtenerTareas(iduser);
     }
 
+    @PostMapping("/crearTarea")
+    public TareaEntity crearTarea(@RequestBody CreateTarea ct){
+        long iduser = ct.getIduser();
+        String descripcion = ct.getDescripcion();
+        return usuarioService.crearTarea(iduser, descripcion);
+    }
+
+    @PostMapping("/cambiarestado")
+    public int cambiarestado(@RequestBody CambiarState cs){
+        long idtarea = cs.getEstado();
+        int estado = cs.getEstado();
+        return usuarioService.cambiarestado(idtarea, estado);
+    }
+
+    @PostMapping("/eliminartarea")
+    public boolean eliminartarea(@RequestBody EliminarTarea et){
+        long idtarea = et.getIdtarea();
+        long iduser = et.getIduser();
+        return usuarioService.eliminartarea(iduser,idtarea);
+    }
 
 }
