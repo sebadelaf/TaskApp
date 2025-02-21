@@ -20,11 +20,11 @@ public class UsuarioEntity {
     private String correo;
     private String password;
     @JsonIgnore
-    @ElementCollection
-    @CollectionTable(name = "usuarios_tareas" // Nombre de la tabla de la colección
-    ,joinColumns = @JoinColumn(name = "iduser"))// Clave foránea para la relación
-    @Column(name = "idtarea") // Nombre de la columna para los IDs de las segunda entidad
-    private List<Long> idstareas = new ArrayList<Long>();
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "usuarios_tareas", joinColumns = @JoinColumn(name = "iduser"))
+    @Column(name = "idtarea")
+    private List<Long> idstareas = new ArrayList<>();
+
 
     //CONSTRUCTOR GENERAL, CON LOS DATOS QUE SE SOLICITARAN PARA LA CONSTRUCCION DE ESTA CLASE
     public UsuarioEntity(String nombre,String apellido, String correo, String password) {

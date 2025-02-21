@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.DTO.UserDTO;
 import com.example.demo.entity.TareaEntity;
 import com.example.demo.entity.UsuarioEntity;
 import com.example.demo.repository.TareasRepository;
@@ -20,22 +21,21 @@ public class UsuarioService {
     private TareasRepository tareasRepository;
     public UsuarioEntity register(String nombre, String apellido, String correo, String password ){
         UsuarioEntity existecorreo=usuarioRepository.findByCorreo(correo);
-        if(existecorreo==null){
-            UsuarioEntity usuario = new UsuarioEntity(nombre,apellido,correo,password);
+        if (existecorreo == null) {
+            UsuarioEntity usuario = new UsuarioEntity(nombre, apellido, correo, password);
             return usuarioRepository.save(usuario);
-
         }
         return null;
     }
 
-    public UsuarioEntity login(String correo, String password){
+    public UserDTO login(String correo, String password) {
         UsuarioEntity usuario = usuarioRepository.findByCorreo(correo);
-
         if (usuario != null && usuario.getPassword().equals(password)) {
-            return usuario;
+            return new UserDTO(usuario.getIduser(),usuario.getNombre(), usuario.getApellido(), usuario.getCorreo());
         }
-        return null; // Si la contraseña no coincide, devuelve null
+        return null;
     }
+
 
     @Transactional
     public List<TareaEntity> obtenerTareas(long id){
@@ -49,15 +49,21 @@ public class UsuarioService {
     }
 
     @Transactional
-    public TareaEntity crearTarea(long iduser,String decripcion){
-        TareaEntity tarea = new TareaEntity(decripcion);
+    public TareaEntity crearTarea(long iduser, String descripcion) {
+        Optional<UsuarioEntity> usuarioOpt = usuarioRepository.findById(iduser);
+        if (usuarioOpt.isEmpty()) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        UsuarioEntity usuario = usuarioOpt.get();
+        TareaEntity tarea = new TareaEntity(descripcion);
         tareasRepository.save(tarea);
-        Optional<UsuarioEntity> usuario = usuarioRepository.findById(iduser);
-        UsuarioEntity user = usuario.get();
-        user.getIdstareas().add(tarea.getIdtarea());
-        usuarioRepository.save(user);
+
+        usuario.getIdstareas().add(tarea.getIdtarea());
+        usuarioRepository.save(usuario);
         return tarea;
     }
+
 
     @Transactional
     public int cambiarestado(long idtarea, int estado){
@@ -82,19 +88,14 @@ public class UsuarioService {
     }
 
     @Transactional
-    public boolean modificartarea(long iduser,long idtarea,String newdescripcion){
-        UsuarioEntity user = usuarioRepository.findById(iduser).get();
-        Hibernate.initialize(user.getIdstareas());
-        List<Long> tareas = user.getIdstareas();
-        if(tareas.contains(idtarea)){
-          List<TareaEntity> tareasentity=obtenerTareas(iduser);
-          for(TareaEntity tarea:tareasentity){
-              if(tarea.getIdtarea()==idtarea){
-                  tarea.setDescripcion(newdescripcion);
-                  tareasRepository.save(tarea);
-                  return true;
-              }
-          }
+    public boolean modificartarea(long iduser, long idtarea, String newdescripcion) {
+        Optional<TareaEntity> tareaOpt = tareasRepository.findById(idtarea);
+
+        if (tareaOpt.isPresent()) {
+            TareaEntity tarea = tareaOpt.get();
+            tarea.setDescripcion(newdescripcion);
+            tareasRepository.save(tarea);
+            return true;
         }
         return false;
     }

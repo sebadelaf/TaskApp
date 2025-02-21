@@ -1,8 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.DTO.CambiarState;
-import com.example.demo.DTO.CreateTarea;
-import com.example.demo.DTO.EliminarTarea;
+import com.example.demo.DTO.*;
 import com.example.demo.entity.TareaEntity;
 import com.example.demo.entity.UsuarioEntity;
 import com.example.demo.service.UsuarioService;
@@ -24,7 +22,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public UsuarioEntity login(@RequestBody UsuarioEntity user){
+    public UserDTO login(@RequestBody UsuarioEntity user){
         return usuarioService.login(user.getCorreo(), user.getPassword());
     }
 
@@ -52,6 +50,14 @@ public class UsuarioController {
         long idtarea = et.getIdtarea();
         long iduser = et.getIduser();
         return usuarioService.eliminartarea(iduser,idtarea);
+    }
+
+    @PostMapping("/modificartarea")
+    public boolean modificararea(@RequestBody ModificarTarea mo){
+        long idtarea = mo.getIdtarea();
+        long iduser = mo.getIduser();
+        String newds= mo.getNewdesc();
+        return usuarioService.modificartarea(idtarea, iduser, newds);
     }
 
 }
